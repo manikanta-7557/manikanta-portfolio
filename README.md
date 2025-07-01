@@ -27,8 +27,8 @@ This is a modern, responsive portfolio website built with React, TypeScript, and
 ### Installation
 1. Clone the repository:
    ```sh
-   git clone https://github.com/manikanta-7557/manikanta-peddi-portfolio.git
-   cd manikanta-peddi-portfolio
+   git clone https://github.com/manikanta-7557/manikanta-portfolio.git
+   cd manikanta-portfolio
    ```
 2. Install dependencies:
    ```sh
