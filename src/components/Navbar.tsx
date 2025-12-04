@@ -60,7 +60,7 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between">
         <div className="text-xl font-bold">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-            Portfolio
+            Manikanta Peddi
           </span>
         </div>
 

@@ -16,10 +16,103 @@ import {
   User, 
   Briefcase,
   Rocket,
-  Settings
+  Settings,
+  GraduationCap
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import React from "react";
+
+const ProjectCard = ({ project }: { project: any }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Use images array if available, otherwise fallback to the single image wrapped in an array
+  const images = project.images && project.images.length > 0 
+    ? project.images 
+    : [project.image];
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    // Only start the slideshow if hovered AND there is more than 1 image
+    if (isHovered && images.length > 1) {
+      interval = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      }, 1500); // Change image every 1.5 seconds
+    } else if (!isHovered) {
+      // Optional: Reset to first image when mouse leaves
+      setCurrentImageIndex(0);
+    }
+    
+    return () => clearInterval(interval);
+  }, [isHovered, images.length]);
+
+  return (
+    <div 
+      className="project-card overflow-hidden rounded-xl h-full flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative h-48 overflow-hidden">
+        {/* Image with transition effect */}
+        <img
+          src={images[currentImageIndex]}
+          alt={project.title}
+          className="project-image-reveal w-full h-full object-cover transition-opacity duration-500 ease-in-out"
+        />
+        
+        {/* Visual indicator of multiple images (dots) */}
+        {images.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+            {images.map((_, idx) => (
+              <div 
+                key={idx} 
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === currentImageIndex ? 'bg-white' : 'bg-white/40'}`}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="project-links flex space-x-4 justify-center">
+          <a
+            href={project.demoLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+            aria-label="View live demo"
+          >
+            <ExternalLink className="w-5 h-5 text-white" />
+          </a>
+          <a
+            href={project.githubLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+            aria-label="View source code"
+          >
+            <Github className="w-5 h-5 text-white" />
+          </a>
+        </div>
+      </div>
+      
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+        <p className="text-gray-400 mb-4 flex-grow">{project.description}</p>
+        <div className="flex flex-wrap gap-2 mt-auto">
+          {project.tech && project.tech.map((tech: string, techIndex: number) => (
+            <Badge
+              key={techIndex}
+              variant="outline"
+              className="border-white/10 text-sm"
+            >
+              {tech}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Index = () => {
   // Updated skill categories
@@ -42,40 +135,68 @@ const Index = () => {
     {
       name: "Other Skills",
       icon: <Laptop className="w-6 h-6 mb-2" />,
-      skills: ["Data Structures & Algorithms", "Problem Solving", "API Development & Integration"]
+      skills: ["Data Structures & Algorithms", "Problem Solving", "Cloud", "API Development & Integration", "IoT"]
     }
   ];
 
-  // Sample projects (you can replace these later)
   const projects = [
     {
-      title: "Reminder System",
-      description: "The Reminder Project is a simple tool that helps users set reminders with a specific time, date, and a note.",
-      image: "/uploads/Reminder.png",
-      tech : [],
-      // tech: ["React", "Redux", "Express", "PostgreSQL"],
-      demoLink: "https://github.com/yourusername/task-management",
-      githubLink: "https://github.com/yourusername/task-management"
-    },
-    {
-      title: "TimeaGen - AI-Powered Smart Timetable & Roadmap Generator",
-      description: "AI-powered timetable & roadmap builder with smart slotting, streaks, and user personalization.",
-      image: "/uploads/TimaGen.png",
-      tech : [],
-      // tech: ["React", "Node.js", "MongoDB", "Stripe"],
-      demoLink: "https://github.com/manikanta-7557/TimeaGen",
-      githubLink: "https://github.com/manikanta-7557/TimeaGen"
+      title: "SecureID - Intelligent Document Verification",
+      description: "A secure web application for automated document verification utilizing OCR technology and Firebase authentication to streamline identity checks and reduce fraud.",
+      images: ["/uploads/SecureID/Admin_Dashboard.png", "/uploads/SecureID/Verifier_Dashboard.png", "/uploads/SecureID/User_Verification_History.png", "/uploads/SecureID/Sign_In_Page.png"],
+      image: "/uploads/SecureID/Verifier_Dashboard.png", 
+      tech: ["React", "Firebase", "OCR", "Node.js"],
+      demoLink: "https://secure-doc-verify.vercel.app/", 
+      githubLink: "https://github.com/manikanta-7557/Secure-DocVerify"
     },
     {
       title: "NyayaPath - AI-Powered Legal Aid Platform",
       description: "AI-powered platform providing legal assistance and resources to users in need.",
+      images: ["/uploads/NyayaPath.png"],
       image: "/uploads/NyayaPath.png",
-      tech : [],
-      // tech: ["Next.js", "TypeScript", "Chart.js", "Firebase"],
+      tech: [],
       demoLink: "https://nyayapath-legal-aid-platform.netlify.app/",
       githubLink: "https://github.com/manikanta-7557?tab=repositories"
+    },
+    {
+      title: "TimeaGen",
+      description: "AI-powered timetable & roadmap builder with smart slotting, streaks, and user personalization.",
+      images: ["/uploads/TimaGen.png"],
+      image: "/uploads/TimaGen.png",
+      tech: [],
+      demoLink: "https://github.com/manikanta-7557/TimeaGen",
+      githubLink: "https://github.com/manikanta-7557/TimeaGen"
+    },
+    {
+      title: "CADMS - AI Disaster Management System",
+      // description: "A comprehensive college administration system for managing student records, faculty information, and academic processes.",
+      images: ["/uploads/CADMS.png"],
+      image: "/uploads/CADMS.png",
+      tech: ["Java", "MySQL"], //, "Swing"],
+      demoLink: "#",
+      githubLink: "https://github.com/manikanta-7557/CADMS"
+    },
+    {
+      title: "Reminder System",
+      description: "The Reminder Project is a simple tool that helps users set reminders with a specific time, date, and a note.",
+      images: ["/uploads/Reminder.png"], 
+      image: "/uploads/Reminder.png",
+      tech: ["Java", "Swing"],
+      demoLink: "#",
+      githubLink: "https://github.com/yourusername/task-management"
     }
-    
+  ];
+
+  const academicProjects = [
+    {
+      title: "Smart Women Safety Watch",
+      description: "A compact, wearable safety device featuring a touch sensor for emergency activation. It utilizes a GPS NEO-6M module for real-time tracking and an ESP32 to send immediate location alerts via the Telegram API.",
+      images: ["/uploads/SafetyWatch.png"],
+      image: "/uploads/SafetyWatch.png",
+      tech: ["ESP32", "IoT", "C++", "GPS NEO-6M", "Telegram API"],
+      demoLink: "#",
+      githubLink: "#"
+    }
   ];
 
   useEffect(() => {
@@ -119,7 +240,7 @@ const Index = () => {
               >
                 Contact Me
               </Button>
-              <a href="/uploads/Manikanta_Peddi_24_Resume.pdf" target="_blank" rel="noopener noreferrer" className="inline-block">
+              <a href="/uploads/New_Resume.pdf" target="_blank" rel="noopener noreferrer" className="inline-block">
                 <Button variant="outline" className="border-white/20 hover:bg-white/10 w-full">
                   View Resume
                 </Button>
@@ -130,7 +251,7 @@ const Index = () => {
           <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
             <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-white/20">
               <Avatar className="w-full h-full">
-                <AvatarImage src="/uploads/propic.png" alt="Peddi Manikanta" className="object-cover" />
+                <AvatarImage src="/uploads/propic.jpg" alt="Peddi Manikanta" className="object-cover" />
                 <AvatarFallback>PM</AvatarFallback>
               </Avatar>
             </div>
@@ -155,7 +276,7 @@ const Index = () => {
               <div className="col-span-1">
                 <div className="relative w-full aspect-square rounded-full overflow-hidden border-4 border-white/20 shadow-lg bg-black/30 flex items-center justify-center">
                   <Avatar className="w-full h-full">
-                    <AvatarImage src="/uploads/propic.png" alt="Peddi Manikanta" className="object-cover" />
+                    <AvatarImage src="/uploads/propic.jpg" alt="Peddi Manikanta" className="object-cover" />
                     <AvatarFallback>PM</AvatarFallback>
                   </Avatar>
                 </div>
@@ -165,6 +286,10 @@ const Index = () => {
                 <h3 className="text-2xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
                   Software Engineer and AI Enthusiast
                 </h3>
+                <div className="mb-4">
+                  <span className="text-blue-400 font-semibold">CGPA:</span>
+                  <span className="text-white ml-2">9.19</span>
+                </div>
                 <p className="text-gray-300 mb-6">
                   I am a Software Engineer with a strong passion for AI, Machine Learning, and Web Development. 
                   My journey in technology started with a curiosity to solve real-world problems through innovative and efficient solutions.
@@ -228,51 +353,25 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, index) => (
-                <div key={index} className="project-card overflow-hidden rounded-xl h-full flex flex-col">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="project-image-reveal w-full h-full object-cover"
-                    />
-                    <div className="project-links flex space-x-4 justify-center">
-                      <a
-                        href={project.demoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all"
-                        aria-label="View live demo"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                      </a>
-                      <a
-                        href={project.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all"
-                        aria-label="View source code"
-                      >
-                        <Github className="w-5 h-5" />
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                    <p className="text-gray-400 mb-4 flex-grow">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mt-auto">
-                      {project.tech.map((tech, techIndex) => (
-                        <Badge
-                          key={techIndex}
-                          variant="outline"
-                          className="border-white/10 text-sm"
-                        >
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <ProjectCard key={index} project={project} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Academic Projects Section */}
+      <section id="academic-projects" className="section">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center mb-12">
+              <GraduationCap className="w-6 h-6 mr-3 text-blue-400" />
+              <h2 className="text-3xl md:text-4xl font-bold">Academic Projects</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {academicProjects.map((project, index) => (
+                <ProjectCard key={index} project={project} />
               ))}
             </div>
           </div>
